@@ -37,6 +37,8 @@ task :install => [:submodule_init, :submodules] do
 
   install_fonts if RUBY_PLATFORM.downcase.include?("darwin")
   
+  install_chrome_custom_css if RUBY_PLATFORM.downcase.include?("darwin")
+  
   install_textmate_theme if RUBY_PLATFORM.downcase.include?("darwin")
   
   install_textmate_preferences if RUBY_PLATFORM.downcase.include?("darwin")
@@ -173,6 +175,13 @@ def install_fonts
   puts "--------------------------------------------------------------------------"
   run %{ cp -f $HOME/.qutie/fonts/* $HOME/Library/Fonts }
   puts
+end
+
+def install_chrome_custom_css
+  puts "--------------------------------------------------------------------------"
+  puts "Installing Google Chrome custom CSS..."
+  puts "--------------------------------------------------------------------------"
+  run %{ cp -f $HOME/.qutie/chrome/base16-eighties.dark.css "$HOME/Library/Application\ Support/Google/Chrome/Default/User\ StyleSheets/Custom.css" }
 end
 
 def install_textmate_theme

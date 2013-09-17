@@ -6,11 +6,11 @@ This repository is heavily based on Yan Pritzker's [YADR](https://github.com/skw
 Installation
 ------------
 
-Installation is automated via rake and the yadr command. To get started please run:
+Installation is automated via rake and the qutie command. To get started please run:
 
     sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`"
 
-Note: YADR will automatically install all of its subcomponents. If you want to be asked about each one, use:
+Note: Qutie will automatically install all of its subcomponents. If you want to be asked about each one, use:
 
     sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`" -s ask
     

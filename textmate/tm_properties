@@ -2,7 +2,7 @@ TM_GIT = "/usr/bin/git"
 
 fontName        = "Menlo"
 fontSize        = 14
-theme           = "Base16 Default Dark"
+theme           = "68e70140-2ef3-4e64-bde3-e321e3b34631"
 
 # Default editing configuration
 #
