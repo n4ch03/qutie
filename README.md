@@ -8,8 +8,10 @@ Installation
 
 Installation is automated via rake and the yadr command. To get started please run:
 
-  sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`"
+    sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`"
 
 Note: YADR will automatically install all of its subcomponents. If you want to be asked about each one, use:
 
-  sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`" -s ask
+    sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`" -s ask
+    
+    
