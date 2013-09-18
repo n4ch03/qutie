@@ -29,3 +29,11 @@ Fully Configured and Visually Appealing VIM unsing Vundle
 Matching Syntax Highlight for TextMate
 
 ![TextMate](https://raw.github.com/3miliano/qutie/master/screenshots/textmate.png)
+
+Node Version Manager
+
+![NVM](https://raw.github.com/3miliano/qutie/master/screenshots/nvm.png)
+
+Ruby Version Manager
+
+![RVM](https://raw.github.com/3miliano/qutie/master/screenshots/rvm.png)
