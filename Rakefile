@@ -1,6 +1,5 @@
 require 'rake'
 require 'fileutils'
-#require File.join(File.dirname(__FILE__), 'bin') #'yadr', 'vundle')
 
 desc "Hook our dotfiles into system-standard positions."
 task :install do
@@ -13,17 +12,8 @@ task :install do
   puts "Copyright (C) 2013 Emiliano Lesende."
   puts "Based on YADR. Copyright (c) 2011-2012, Yan Pritzker. All rights reserved."
   puts "--------------------------------------------------------------------------\033[0m"
-
   
-  #install_homebrew if RUBY_PLATFORM.downcase.include?("darwin")
-
-  # this has all the runcoms from this directory.
-  #file_operation(Dir.glob('git/*')) if want_to_install?('git configs (color, aliases)')
-  #file_operation(Dir.glob('irb/*')) if want_to_install?('irb/pry configs (more colorful)')
-  #file_operation(Dir.glob('ruby/*')) if want_to_install?('rubygems config (faster/no docs)')
-  #file_operation(Dir.glob('ctags/*')) if want_to_install?('ctags config (better js/ruby support)')
-  #file_operation(Dir.glob('tmux/*')) if want_to_install?('tmux config')
-  #file_operation(Dir.glob('vimify/*')) if want_to_install?('vimification of command line tools')
+  install_homebrew
   
   install_vundle
   
