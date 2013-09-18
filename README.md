@@ -25,3 +25,7 @@ Powerline Prompt
 Fully Configured and Visually Appealing VIM unsing Vundle
 
 ![VIM](https://raw.github.com/3miliano/qutie/master/screenshots/vim.png)
+
+Matching Syntax Highlight for TextMate
+
+![TextMate](https://raw.github.com/3miliano/qutie/master/screenshots/textmate.png)
