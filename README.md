@@ -15,3 +15,9 @@ Note: Qutie will automatically install all of its subcomponents. If you want to 
     sh -c "`curl -fsSL https://raw.github.com/3miliano/qutie/master/install.sh`" -s ask
     
     
+Features
+--------
+
+Powerline Prompt
+
+![Powerline Prompt](https://raw.github.com/3miliano/qutie/master/screenshots/powerline.png)

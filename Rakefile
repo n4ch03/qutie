@@ -207,6 +207,8 @@ def install_prezto
   %x[rm -f $HOME/.zpreztorc]
   %x[cp -f $HOME/.qutie/zsh/zpreztorc $HOME/.zpreztorc]
   
+  %x[cp -Rf $HOME/.qutie/zsh/modules/base16 $HOME/.zprezto/modules]
+  
   if ENV["SHELL"].include? 'zsh' then
     puts "\033[31m===> \033[0mZsh is already configured as your shell of choice. Restart your session to load the new settings"
   else
