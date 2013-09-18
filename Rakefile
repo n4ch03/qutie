@@ -45,6 +45,8 @@ task :install => [:submodule_init, :submodules] do
 
   install_term_theme if RUBY_PLATFORM.downcase.include?("darwin")
 
+  install_terminal_theme if RUBY_PLATFORM.downcase.include?("darwin")
+
   success_msg("installed")
 end
 
@@ -146,49 +148,36 @@ end
 def install_homebrew
   run %{which brew}
   unless $?.success?
-    puts "--------------------------------------------------------------------------"
-    puts "Installing Homebrew, the OSX package manager...If it's"
-    puts "already installed, this will do nothing."
-    puts "--------------------------------------------------------------------------"
+    puts "\033[33m===> \033[0mInstalling Homebrew, the OSX package manager... If it's already installed, this will do nothing."
     run %{ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"}
   end
 
   puts
   puts
-  puts "--------------------------------------------------------------------------"
-  puts "Updating Homebrew."
-  puts "--------------------------------------------------------------------------"
+  puts "\033[33m===> \033[0mUpdating Homebrew."
   run %{brew update}
   puts
   puts
-  puts "--------------------------------------------------------------------------"
-  puts "Installing Homebrew packages...There may be some warnings."
-  puts "--------------------------------------------------------------------------"
+  puts "\033[33m===> \033[0mInstalling Homebrew packages...There may be some warnings."
   run %{brew install zsh ctags git hub tmux reattach-to-user-namespace coreutils}
   puts
   puts
 end
 
 def install_fonts
-  puts "--------------------------------------------------------------------------"
-  puts "Installing patched fonts for Powerline..."
-  puts "--------------------------------------------------------------------------"
+  puts "\033[33m===> \033[0mInstalling patched fonts for Powerline..."
   run %{ cp -f $HOME/.qutie/fonts/* $HOME/Library/Fonts }
   puts
 end
 
 def install_chrome_custom_css
-  puts "--------------------------------------------------------------------------"
-  puts "Installing Google Chrome custom CSS..."
-  puts "--------------------------------------------------------------------------"
+  puts "\033[33m===> \033[0mInstalling Google Chrome custom CSS..."
   run %{ cp -f $HOME/.qutie/chrome/base16-eighties.dark.css "$HOME/Library/Application\ Support/Google/Chrome/Default/User\ StyleSheets/Custom.css" }
 end
 
 def install_textmate_theme
   if File.exists?('/Applications/TextMate.app')
-    puts "--------------------------------------------------------------------------"
-    puts "Installing Base16 themes in your TextMate configuration..."
-    puts "--------------------------------------------------------------------------"
+    puts "\033[33m===> \033[0mInstalling Base16 themes in your TextMate configuration..."
     run %{ mkdir -p "$HOME/Library/Application Support/Avian/Bundles/" }
     run %{ cp -R $HOME/.qutie/textmate/Base16.tmbundle "$HOME/Library/Application Support/Avian/Bundles/" }
   end
@@ -196,146 +185,90 @@ end
 
 def install_textmate_preferences
   if File.exists?('/Applications/TextMate.app')
-    puts "--------------------------------------------------------------------------"
-    puts "Customizing preferences of TextMate 2..."
-    puts "--------------------------------------------------------------------------"
+    puts "\033[33m===> \033[0mCustomizing preferences of TextMate 2..."
     run %{ cp -f $HOME/.qutie/textmate/tm_properties "$HOME/.tm_properties" }
   end
 end
 
+def install_terminal_theme
+  puts "\033[33m===> \033[0mInstalling Base16 theme in your Terminal.app configuration..."
+  run %{ /usr/bin/defaults write com.apple.Terminal 'Window Settings' -dict-add 'Base16' '#{File.read("terminal/base16.profile")}' }
+  run %{ /usr/bin/defaults write com.apple.Terminal 'Default Window Settings' 'Base16' }
+  run %{ /usr/bin/defaults write com.apple.Terminal 'Startup Window Settings' 'Base16' }
+end
+
 def install_term_theme
-  puts "--------------------------------------------------------------------------"
-  puts "Installing Base16 themes in your iTerm 2 configuration..."
-  puts "--------------------------------------------------------------------------"
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Bright Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-bright.dark.256.itermcolors' :'Custom Color Presets':'Base16 Bright Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Bright Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-bright.dark.itermcolors' :'Custom Color Presets':'Base16 Bright Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Bright Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-bright.light.256.itermcolors' :'Custom Color Presets':'Base16 Bright Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Bright Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-bright.light.itermcolors' :'Custom Color Presets':'Base16 Bright Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Chalk Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-chalk.dark.256.itermcolors' :'Custom Color Presets':'Base16 Chalk Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Chalk Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-chalk.dark.itermcolors' :'Custom Color Presets':'Base16 Chalk Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Chalk Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-chalk.light.256.itermcolors' :'Custom Color Presets':'Base16 Chalk Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Chalk Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-chalk.light.itermcolors' :'Custom Color Presets':'Base16 Chalk Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
+  puts "\033[33m===> \033[0mInstalling Base16 themes in your iTerm 2 configuration..."
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Dark 256'  '#{File.read("iterm2/base16-bright.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Dark'      '#{File.read("iterm2/base16-bright.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Light 256' '#{File.read("iterm2/base16-bright.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Light'     '#{File.read("iterm2/base16-bright.light.itermcolors")}' }
 
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Default Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-default.dark.256.itermcolors' :'Custom Color Presets':'Base16 Default Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Default Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-default.dark.itermcolors' :'Custom Color Presets':'Base16 Default Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Default Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-default.light.256.itermcolors' :'Custom Color Presets':'Base16 Default Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Default Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-default.light.itermcolors' :'Custom Color Presets':'Base16 Default Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Eighties Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-eighties.dark.256.itermcolors' :'Custom Color Presets':'Base16 Eighties Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Eighties Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-eighties.dark.itermcolors' :'Custom Color Presets':'Base16 Eighties Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Eighties Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-eighties.light.256.itermcolors' :'Custom Color Presets':'Base16 Eighties Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Eighties Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-eighties.light.itermcolors' :'Custom Color Presets':'Base16 Eighties Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Greenscreen Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-greenscreen.dark.256.itermcolors' :'Custom Color Presets':'Base16 Greenscreen Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Greenscreen Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-greenscreen.dark.itermcolors' :'Custom Color Presets':'Base16 Greenscreen Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Greenscreen Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-greenscreen.light.256.itermcolors' :'Custom Color Presets':'Base16 Greenscreen Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Greenscreen Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-greenscreen.light.itermcolors' :'Custom Color Presets':'Base16 Greenscreen Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Mocha Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-mocha.dark.256.itermcolors' :'Custom Color Presets':'Base16 Mocha Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Mocha Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-mocha.dark.itermcolors' :'Custom Color Presets':'Base16 Mocha Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Mocha Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-mocha.light.256.itermcolors' :'Custom Color Presets':'Base16 Mocha Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Mocha Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-mocha.light.itermcolors' :'Custom Color Presets':'Base16 Mocha Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Monokai Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-monokai.dark.256.itermcolors' :'Custom Color Presets':'Base16 Monokai Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Monokai Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-monokai.dark.itermcolors' :'Custom Color Presets':'Base16 Monokai Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Monokai Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-monokai.light.256.itermcolors' :'Custom Color Presets':'Base16 Monokai Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Monokai Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-monokai.light.itermcolors' :'Custom Color Presets':'Base16 Monokai Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Chalk Dark 256'  '#{File.read("iterm2/base16-chalk.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Chalk Dark'      '#{File.read("iterm2/base16-chalk.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Chalk Light 256' '#{File.read("iterm2/base16-chalk.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Chalk Light'     '#{File.read("iterm2/base16-chalk.light.itermcolors")}' }
 
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Ocean Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-ocean.dark.256.itermcolors' :'Custom Color Presets':'Base16 Ocean Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Ocean Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-ocean.dark.itermcolors' :'Custom Color Presets':'Base16 Ocean Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Ocean Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-ocean.light.256.itermcolors' :'Custom Color Presets':'Base16 Ocean Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Ocean Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-ocean.light.itermcolors' :'Custom Color Presets':'Base16 Ocean Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Default Dark 256'  '#{File.read("iterm2/base16-default.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Default Dark'      '#{File.read("iterm2/base16-default.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Default Light 256' '#{File.read("iterm2/base16-default.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Default Light'     '#{File.read("iterm2/base16-default.light.itermcolors")}' }
 
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Railscasts Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-railscasts.dark.256.itermcolors' :'Custom Color Presets':'Base16 Railscasts Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Railscasts Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-railscasts.dark.itermcolors' :'Custom Color Presets':'Base16 Railscasts Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Railscasts Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-railscasts.light.256.itermcolors' :'Custom Color Presets':'Base16 Railscasts Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Railscasts Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-railscasts.light.itermcolors' :'Custom Color Presets':'Base16 Railscasts Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Eighties Dark 256'  '#{File.read("iterm2/base16-eighties.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Eighties Dark'      '#{File.read("iterm2/base16-eighties.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Eighties Light 256' '#{File.read("iterm2/base16-eighties.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Eighties Light'     '#{File.read("iterm2/base16-eighties.light.itermcolors")}' }
 
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Solarized Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-solarized.dark.256.itermcolors' :'Custom Color Presets':'Base16 Solarized Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Solarized Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-solarized.dark.itermcolors' :'Custom Color Presets':'Base16 Solarized Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Solarized Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-solarized.light.256.itermcolors' :'Custom Color Presets':'Base16 Solarized Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Solarized Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-solarized.light.itermcolors' :'Custom Color Presets':'Base16 Solarized Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Tomorrow Dark 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-tomorrow.dark.256.itermcolors' :'Custom Color Presets':'Base16 Tomorrow Dark 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Tomorrow Dark' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-tomorrow.dark.itermcolors' :'Custom Color Presets':'Base16 Tomorrow Dark'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Tomorrow Light 256' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-tomorrow.light.256.itermcolors' :'Custom Color Presets':'Base16 Tomorrow Light 256'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Add :'Custom Color Presets':'Base16 Tomorrow Light' dict" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
-  run %{ /usr/libexec/PlistBuddy -c "Merge 'iterm2/base16-tomorrow.light.itermcolors' :'Custom Color Presets':'Base16 Tomorrow Light'" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Greenscreen Dark 256'  '#{File.read("iterm2/base16-greenscreen.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Greenscreen Dark'      '#{File.read("iterm2/base16-greenscreen.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Greenscreen Light 256' '#{File.read("iterm2/base16-greenscreen.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Greenscreen Light'     '#{File.read("iterm2/base16-greenscreen.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Mocha Dark 256'  '#{File.read("iterm2/base16-mocha.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Mocha Dark'      '#{File.read("iterm2/base16-mocha.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Mocha Light 256' '#{File.read("iterm2/base16-mocha.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Mocha Light'     '#{File.read("iterm2/base16-mocha.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Monokai Dark 256'  '#{File.read("iterm2/base16-monokai.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Monokai Dark'      '#{File.read("iterm2/base16-monokai.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Monokai Light 256' '#{File.read("iterm2/base16-monokai.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Monokai Light'     '#{File.read("iterm2/base16-monokai.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Ocean Dark 256'  '#{File.read("iterm2/base16-ocean.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Ocean Dark'      '#{File.read("iterm2/base16-ocean.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Ocean Light 256' '#{File.read("iterm2/base16-ocean.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Ocean Light'     '#{File.read("iterm2/base16-ocean.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Pop Dark 256'  '#{File.read("iterm2/base16-pop.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Pop Dark'      '#{File.read("iterm2/base16-pop.dark.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Railscasts Dark 256'  '#{File.read("iterm2/base16-railscasts.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Railscasts Dark'      '#{File.read("iterm2/base16-railscasts.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Railscasts Light 256' '#{File.read("iterm2/base16-railscasts.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Railscasts Light'     '#{File.read("iterm2/base16-railscasts.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Solarized Dark 256'  '#{File.read("iterm2/base16-solarized.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Solarized Dark'      '#{File.read("iterm2/base16-solarized.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Solarized Light 256' '#{File.read("iterm2/base16-solarized.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Solarized Light'     '#{File.read("iterm2/base16-solarized.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Tomorrow Dark 256'  '#{File.read("iterm2/base16-tomorrow.dark.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Tomorrow Dark'      '#{File.read("iterm2/base16-tomorrow.dark.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Tomorrow Light 256' '#{File.read("iterm2/base16-tomorrow.light.256.itermcolors")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Tomorrow Light'     '#{File.read("iterm2/base16-tomorrow.light.itermcolors")}' }
+
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'New Bookmarks' -array-add '#{File.read("iterm2/base16.profile")}' }
+  run %{ /usr/bin/defaults write com.googlecode.iterm2 'Default Bookmark Guid' '0DF677D1-A5C9-40DE-BB66-0342059C18D4' }
 
   # If iTerm2 is not installed or has never run, we can't autoinstall the profile since the plist is not there
   if !File.exists?(File.join(ENV['HOME'], '/Library/Preferences/com.googlecode.iterm2.plist'))
-    puts "--------------------------------------------------------------------------"
-    puts "To make sure your profile is using a Base16 theme"
-    puts "Please check your settings under:"
+    puts "\033[33m--------------------------------------------------------------------------\033[0m"
+    puts "\033[33mTo make sure your profile is using a Base16 theme\033[0m"
+    puts "\033[33mPlease check your settings under:\033[0m"
     puts "\033[33mPreferences > Profiles > [your profile] > Colors > Load Preset...\033[0m"
-    puts "--------------------------------------------------------------------------"
+    puts "\033[33m--------------------------------------------------------------------------\033[0m"
     return
   end
-
-  # Ask the user which theme he wants to install
-  message = "Which theme would you like to apply to your iTerm2 profile?"
-  color_scheme_file = File.join('iterm2', "base16-eighties.dark.256.itermcolors")
-
-  # Ask the user on which profile he wants to install the theme
-  profiles = iTerm_profile_list
-  (profiles.size).times { |idx| apply_theme_to_iterm_profile_idx idx, color_scheme_file }
-end
-
-def iTerm_available_themes
-   Dir['iterm2/*.itermcolors'].map { |value| File.basename(value, '.itermcolors')}
-end
-
-def iTerm_profile_list
-  profiles=Array.new
-  begin
-    profiles <<  %x{ /usr/libexec/PlistBuddy -c "Print :'New Bookmarks':#{profiles.size}:Name" $HOME/Library/Preferences/com.googlecode.iterm2.plist 2>/dev/null}
-  end while $?.exitstatus==0
-  profiles.pop
-  profiles
 end
 
 def install_prezto
@@ -419,15 +352,6 @@ end
 def list_vim_submodules
   result=`git submodule -q foreach 'echo $name"||"\`git remote -v | awk "END{print \\\\\$2}"\`'`.select{ |line| line =~ /^vim.bundle/ }.map{ |line| line.split('||') }
   Hash[*result.flatten]
-end
-
-def apply_theme_to_iterm_profile_idx(index, color_scheme_path)
-  values = Array.new
-  16.times { |i| values << "Ansi #{i} Color" }
-  values << ['Background Color', 'Bold Color', 'Cursor Color', 'Cursor Text Color', 'Foreground Color', 'Selected Text Color', 'Selection Color']
-  values.flatten.each { |entry| run %{ /usr/libexec/PlistBuddy -c "Delete :'New Bookmarks':#{index}:'#{entry}'" $HOME/Library/Preferences/com.googlecode.iterm2.plist } }
-
-  run %{ /usr/libexec/PlistBuddy -c "Merge '#{color_scheme_path}' :'New Bookmarks':#{index}" $HOME/Library/Preferences/com.googlecode.iterm2.plist }
 end
 
 def success_msg(action)
