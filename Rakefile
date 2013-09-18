@@ -3,7 +3,7 @@ require 'fileutils'
 #require File.join(File.dirname(__FILE__), 'bin') #'yadr', 'vundle')
 
 desc "Hook our dotfiles into system-standard positions."
-task :install => [:submodule_init, :submodules] do
+task :install do
   puts "\033[33m   ____        __  _        "
   puts "\033[33m  / __ \\__  __/ /_(_)__     \033[37mqut.ie"
   puts "\033[33m / / / / / / / __/ / _ \\    \033[31m/'kyoote/"
@@ -24,108 +24,54 @@ task :install => [:submodule_init, :submodules] do
   #file_operation(Dir.glob('ctags/*')) if want_to_install?('ctags config (better js/ruby support)')
   #file_operation(Dir.glob('tmux/*')) if want_to_install?('tmux config')
   #file_operation(Dir.glob('vimify/*')) if want_to_install?('vimification of command line tools')
-  #if want_to_install?('vim configuration (highly recommended)')
-  #  file_operation(Dir.glob('{vim,vimrc}')) 
-  #  Rake::Task["install_vundle"].execute
-  #end
-
-  #Rake::Task["install_prezto"].execute
   
-  install_prezto if RUBY_PLATFORM.downcase.include?("darwin")
-
-  install_fonts if RUBY_PLATFORM.downcase.include?("darwin")
+  install_vundle
   
-  install_chrome_custom_css if RUBY_PLATFORM.downcase.include?("darwin")
+  install_prezto
   
-  install_textmate_theme if RUBY_PLATFORM.downcase.include?("darwin")
+  install_nvm
   
-  install_textmate_preferences if RUBY_PLATFORM.downcase.include?("darwin")
+  install_fonts
+  
+  install_chrome_custom_css
+  
+  install_textmate_theme
+  
+  install_textmate_preferences
 
-  install_term_theme if RUBY_PLATFORM.downcase.include?("darwin")
+  install_term_theme
 
-  install_terminal_theme if RUBY_PLATFORM.downcase.include?("darwin")
+  install_terminal_theme
 
   success_msg("installed")
 end
 
-task :update do
-  Rake::Task["vundle_migration"].execute if needs_migration_to_vundle?
-  Rake::Task["install"].execute
-  #TODO: for now, we do the same as install. But it would be nice
-  #not to clobber zsh files
-end
-
-task :submodule_init do
-  #unless ENV["SKIP_SUBMODULES"]
-  #  run %{ git submodule update --init --recursive }
-  #end
-end
-
-desc "Init and update submodules."
-task :submodules do
-  #unless ENV["SKIP_SUBMODULES"]
-  #  puts "======================================================"
-  #  puts "Downloading YADR submodules...please wait"
-  #  puts "======================================================"
-
-  #  run %{
-  #    cd $HOME/.yadr
-  #    git submodule update --recursive
-  #    git clean -df
-  #  }
-  #  puts
-  #end
-end
-
-desc "Performs migration from pathogen to vundle"
-task :vundle_migration do
-  puts "======================================================"
-  puts "Migrating from pathogen to vundle vim plugin manager. "
-  puts "This will move the old .vim/bundle directory to" 
-  puts ".vim/bundle.old and replacing all your vim plugins with"
-  puts "the standard set of plugins. You will then be able to "
-  puts "manage your vim's plugin configuration by editing the "
-  puts "file .vim/vundles.vim"
-  puts "======================================================"
-
-  Dir.glob(File.join('vim', 'bundle','**')) do |sub_path|
-    run %{git config -f #{File.join('.git', 'config')} --remove-section submodule.#{sub_path}}
-    # `git rm --cached #{sub_path}`
-    FileUtils.rm_rf(File.join('.git', 'modules', sub_path))
-  end
-  FileUtils.mv(File.join('vim','bundle'), File.join('vim', 'bundle.old'))
-end
-
-desc "Runs Vundle installer in a clean vim environment"
-task :install_vundle do
-  puts "======================================================"
-  puts "Installing vundle."
-  puts "The installer will now proceed to run BundleInstall."
-  puts "Due to a bug, the installer may report some errors"
-  puts "when installing the plugin 'syntastic'. Fortunately"
-  puts "Syntastic will install and work properly despite the"
-  puts "errors so please just ignore them and let's hope for"
-  puts "an update that fixes the problem!"
-  puts "======================================================"
-
-  puts ""
+def install_nvm
+  puts "\033[34m===> \033[0mInstalling Node Version Manager (NVM)..."
   
-  run %{
-    cd $HOME/.yadr
-    git clone https://github.com/gmarik/vundle.git #{File.join('vim','bundle', 'vundle')}
-  }
+  %x[git clone https://github.com/creationix/nvm.git $HOME/.nvm]
+end
 
-  Vundle::update_vundle
+def install_vundle
+  puts "\033[34m===> \033[0mInstalling Vundle for VIM..."
+  
+  unless File.exists?(File.join(ENV['HOME'], ".vim", "bundle", "vundle"))
+    %x[mkdir -p $HOME/.vim/bundle/vundle]
+    %x[git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle]
+  end
+
+  puts "\033[34m===> \033[0mInstalling a custom .vimrc file..."
+  %x[cp -f $HOME/.qutie/vim/vimrc $HOME/.vimrc]
+
+  puts "\033[34m===> \033[0mSetting a list of default vundles..."
+  %x[cp -f $HOME/.qutie/vim/vundles.vim $HOME/.vim/vundles.vim]
+
+  puts "\033[34m===> \033[0mInstalling vundles..."
+  %x[vim --noplugin -u $HOME/.vim/vundles.vim -N "+set hidden" "+syntax on" +BundleInstall +qall]
+  
 end
 
 task :default => 'install'
-
-
-private
-def run(cmd)
-  puts "[Running] #{cmd}"
-  `#{cmd}` unless ENV['DEBUG']
-end
 
 def install_homebrew
   %x[which brew]
@@ -279,51 +225,6 @@ def want_to_install? (section)
   else
     true
   end
-end
-
-def file_operation(files, method = :symlink)
-  files.each do |f|
-    file = f.split('/').last
-    source = "#{ENV["PWD"]}/#{f}"
-    target = "#{ENV["HOME"]}/.#{file}"
-
-    puts "======================#{file}=============================="
-    puts "Source: #{source}"
-    puts "Target: #{target}"
-
-    if File.exists?(target) && (!File.symlink?(target) || (File.symlink?(target) && File.readlink(target) != source))
-      puts "[Overwriting] #{target}...leaving original at #{target}.backup..."
-      run %{ mv "$HOME/.#{file}" "$HOME/.#{file}.backup" }
-    end
-
-    if method == :symlink
-      run %{ ln -nfs "#{source}" "#{target}" }
-    else
-      run %{ cp -f "#{source}" "#{target}" }
-    end
-
-    # Temporary solution until we find a way to allow customization
-    # This modifies zshrc to load all of yadr's zsh extensions.
-    # Eventually yadr's zsh extensions should be ported to prezto modules.
-    if file == 'zshrc'
-      File.open(target, 'a') do |zshrc|
-        zshrc.puts('for config_file ($HOME/.yadr/zsh/*.zsh) source $config_file')
-      end
-    end
-
-    puts "=========================================================="
-    puts
-  end
-end
-
-def needs_migration_to_vundle?
-  File.exists? File.join('vim', 'bundle', 'tpope-vim-pathogen')
-end
-
-
-def list_vim_submodules
-  result=`git submodule -q foreach 'echo $name"||"\`git remote -v | awk "END{print \\\\\$2}"\`'`.select{ |line| line =~ /^vim.bundle/ }.map{ |line| line.split('||') }
-  Hash[*result.flatten]
 end
 
 def success_msg(action)
