@@ -32,8 +32,61 @@ task :install do
   install_term_theme
 
   install_terminal_theme
+  
+  install_osx_defaults
 
   success_msg("installed")
+end
+
+def install_osx_defaults
+  puts "\033[34m===> \033[0mDisabling menu bar transparency..."
+  %x[defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false]
+
+  puts "\033[34m===> \033[0mCustomizing battery indicator..."
+  %x[defaults write com.apple.menuextra.battery ShowPercent -string "NO"]
+  %x[defaults write com.apple.menuextra.battery ShowTime -string "YES"end]
+
+  puts "\033[34m===> \033[0mEnabling expanded save panel by default..."
+  %x[defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true]
+
+  puts "\033[34m===> \033[0mDisabling the \"Are you sure you want to open this application?\" dialog..."
+  %x[defaults write com.apple.LaunchServices LSQuarantine -bool false]
+
+  puts "\033[34m===> \033[0mEnabling subpixel font rendering on non-Apple LCDs..."
+  %x[defaults write NSGlobalDomain AppleFontSmoothing -int 2]
+
+  puts "\033[34m===> \033[0mDisabling press-and-hold for keys in favor of key repeat..."
+  %x[defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false]
+
+  puts "\033[34m===> \033[0mDisabling auto-correct..."
+  %x[defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false]
+
+  puts "\033[34m===> \033[0mRequiring password immediately after sleep or screen saver begins..."
+  %x[defaults write com.apple.screensaver askForPassword -int 1]
+  %x[defaults write com.apple.screensaver askForPasswordDelay -int 0]
+
+  puts "\033[34m===> \033[0mDisabling disk image verification..."
+  %x[defaults write com.apple.frameworks.diskimages skip-verify -bool true]
+  %x[defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true]
+  %x[defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true]
+
+  puts "\033[34m===> \033[0mAvoiding creating .DS_Store files on network volumes..."
+  %x[defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true]
+
+  puts "\033[34m===> \033[0mDisable warning when changing file extension..."
+  %x[defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false]
+
+  puts "\033[34m===> \033[0mEnabling spring loading for all Dock items..."
+  %x[defaults write com.apple.dock enable-spring-load-actions-on-all-items -bool true]
+
+  puts "\033[34m===> \033[0mEnabling iTunes track notifications in the Dock..."
+  %x[defaults write com.apple.dock itunes-notifications -bool true]
+
+  puts "\033[34m===> \033[0mDisabling shadow in screenshots..."
+  %x[defaults write com.apple.screencapture disable-shadow -bool true]
+
+  puts "\033[34m===> \033[0mRestarting affected applications..."
+  %x[for app in Finder Dock Mail Safari iTunes iCal Address\ Book SystemUIServer; do killall "$app" > /dev/null 2>&1; done]
 end
 
 def install_nvm
@@ -56,8 +109,8 @@ def install_vundle
   puts "\033[34m===> \033[0mSetting a list of default vundles..."
   %x[cp -f $HOME/.qutie/vim/vundles.vim $HOME/.vim/vundles.vim]
 
-  puts "\033[34m===> \033[0mInstalling vundles..."
-  %x[vim --noplugin -u $HOME/.vim/vundles.vim -N "+set hidden" "+syntax on" +BundleInstall +qall]
+  puts "\033[34m===> \033[0mInstalling vundles (this may take a while)..."
+  %x[vim --noplugin -u $HOME/.vim/vundles.vim -N "+set hidden" "+syntax on" +BundleInstall +qall!]
   
 end
 
@@ -90,6 +143,9 @@ end
 def install_chrome_custom_css
   puts "\033[34m===> \033[0mInstalling Google Chrome Developer Tools custom CSS..."
   %x[cp -f $HOME/.qutie/chrome/base16-eighties.dark.css "$HOME/Library/Application\ Support/Google/Chrome/Default/User\ StyleSheets/Custom.css"]
+  
+  puts "\033[34m===> \033[0mDisabling Swipe controls for Google Chromes..."
+  %x[defaults write com.google.Chrome.plist AppleEnableSwipeNavigateWithScrolls -bool FALSE]
 end
 
 def install_textmate_theme
