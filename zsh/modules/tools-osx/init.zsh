@@ -1,0 +1,1 @@
+export PATH="$HOME/.tools-osx/src:$PATH"

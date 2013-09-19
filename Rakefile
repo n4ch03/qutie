@@ -2,8 +2,13 @@ require 'rake'
 require 'fileutils'
 
 desc "Hook our dotfiles into system-standard positions."
-task :install do
-  puts "\033[33m   ____        __  _        "
+task :install => [ :welcome, :install_homebrew, :install_vundle, :install_prezto, :install_nvm, :install_jenv, :install_fonts, :install_chrome_custom_css, :install_textmate_theme, :install_textmate_preferences, :install_term_theme, :install_terminal_theme, :install_osx_defaults, :install_osx_utils ] do
+
+  success_msg("installed")
+end
+
+task :welcome do
+  puts "\033[33m   ____        __  _"
   puts "\033[33m  / __ \\__  __/ /_(_)__     \033[37mqut.ie"
   puts "\033[33m / / / / / / / __/ / _ \\    \033[31m/'kyoote/"
   puts "\033[33m/ /_/ / /_/ / /_/ /  __/    \033[32mNoun"
@@ -12,35 +17,19 @@ task :install do
   puts "Copyright (C) 2013 Emiliano Lesende."
   puts "Based on YADR. Copyright (c) 2011-2012, Yan Pritzker. All rights reserved."
   puts "--------------------------------------------------------------------------\033[0m"
-  
-  install_homebrew
-  
-  install_vundle
-  
-  install_prezto
-  
-  install_nvm
-
-  install_jenv
-  
-  install_fonts
-  
-  install_chrome_custom_css
-  
-  install_textmate_theme
-  
-  install_textmate_preferences
-
-  install_term_theme
-
-  install_terminal_theme
-  
-  install_osx_defaults
-
-  success_msg("installed")
 end
 
-def install_osx_defaults
+task :install_osx_utils do
+  puts "\033[34m===> \033[0mInstalling miscelaneous OSX utils like trash, pbcopy, eject, etc..."
+  unless File.exists?(File.join(ENV['HOME'], ".tools-osx"))
+    %x[mkdir -p $HOME/.tools-osx]
+    %x[git clone git@github.com:morgant/tools-osx.git $HOME/.tools-osx]
+  end
+
+  %x[cp -Rf $HOME/.qutie/zsh/modules/tools-osx $HOME/.zprezto/modules]
+end
+
+task :install_osx_defaults do
   puts "\033[34m===> \033[0mDisabling menu bar transparency..."
   %x[defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false]
 
@@ -91,13 +80,15 @@ def install_osx_defaults
   %x[for app in Finder Dock Mail Safari iTunes iCal Address\ Book SystemUIServer; do killall "$app" > /dev/null 2>&1; done]
 end
 
-def install_nvm
+task :install_nvm do
   puts "\033[34m===> \033[0mInstalling Node Version Manager (NVM)..."
   
-  %x[git clone https://github.com/creationix/nvm.git $HOME/.nvm]
+  unless File.exists?(File.join(ENV['HOME'], ".nvm"))
+    %x[git clone https://github.com/creationix/nvm.git $HOME/.nvm]
+  end
 end
 
-def install_vundle
+task :install_vundle do
   puts "\033[34m===> \033[0mInstalling Vundle for VIM..."
   
   unless File.exists?(File.join(ENV['HOME'], ".vim", "bundle", "vundle"))
@@ -118,7 +109,7 @@ end
 
 task :default => 'install'
 
-def install_homebrew
+task :install_homebrew do
   %x[which brew]
   unless $?.success?
     puts "\033[34m===> \033[0mInstalling Homebrew, the OSX package manager... If it's already installed, this will do nothing."
@@ -137,12 +128,12 @@ def install_homebrew
   puts
 end
 
-def install_fonts
+task :install_fonts do
   puts "\033[34m===> \033[0mInstalling patched fonts for Powerline..."
   %x[cp -f $HOME/.qutie/fonts/* $HOME/Library/Fonts]
 end
 
-def install_chrome_custom_css
+task :install_chrome_custom_css do
   puts "\033[34m===> \033[0mInstalling Google Chrome Developer Tools custom CSS..."
   %x[cp -f $HOME/.qutie/chrome/base16-eighties.dark.css "$HOME/Library/Application\ Support/Google/Chrome/Default/User\ StyleSheets/Custom.css"]
   
@@ -150,7 +141,7 @@ def install_chrome_custom_css
   %x[defaults write com.google.Chrome.plist AppleEnableSwipeNavigateWithScrolls -bool FALSE]
 end
 
-def install_textmate_theme
+task :install_textmate_theme do
   if File.exists?('/Applications/TextMate.app')
     puts "\033[34m===> \033[0mInstalling Base16 themes in your TextMate configuration..."
     %x[mkdir -p "$HOME/Library/Application Support/Avian/Bundles/"]
@@ -158,21 +149,21 @@ def install_textmate_theme
   end
 end
 
-def install_textmate_preferences
+task :install_textmate_preferences do
   if File.exists?('/Applications/TextMate.app')
     puts "\033[34m===> \033[0mCustomizing preferences of TextMate 2..."
     %x[cp -f $HOME/.qutie/textmate/tm_properties "$HOME/.tm_properties"]
   end
 end
 
-def install_terminal_theme
+task :install_terminal_theme do
   puts "\033[34m===> \033[0mInstalling Base16 theme in your Terminal.app configuration..."
   %x[/usr/bin/defaults write com.apple.Terminal 'Window Settings' -dict-add 'Base16' '#{File.read("terminal/base16.profile")}']
   %x[/usr/bin/defaults write com.apple.Terminal 'Default Window Settings' 'Base16']
   %x[/usr/bin/defaults write com.apple.Terminal 'Startup Window Settings' 'Base16']
 end
 
-def install_term_theme
+task :install_term_theme do
   puts "\033[34m===> \033[0mInstalling Base16 themes in your iTerm 2 configuration..."
   %x[ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Dark 256'  '#{File.read("iterm2/base16-bright.dark.256.itermcolors")}' ]
   %x[ /usr/bin/defaults write com.googlecode.iterm2 'Custom Color Presets' -dict-add 'Base16 Bright Dark'      '#{File.read("iterm2/base16-bright.dark.itermcolors")}' ]
@@ -246,7 +237,7 @@ def install_term_theme
   end
 end
 
-def install_jenv
+task :install_jenv do
   puts "\033[34m===> \033[0mInstalling jEnv (Java Version Manager)..."
   unless File.exists?(File.join(ENV['HOME'], ".jenv"))
     %x[git clone https://github.com/gcuisinier/jenv.git ~/.jenv]
@@ -261,12 +252,12 @@ def install_jenv
   end
 
   Dir.glob("/Library/Java/JavaVirtualMachines/*") do |f|
-    puts "\033[34m===> \033[0mAdding JDK located at /Library/Java/JavaVirtualMachines/#{f}..."
+    puts "\033[34m===> \033[0mAdding JDK located at #{f}..."
     %x[$HOME/.jenv/bin/jenv add #{f}/Contents/Home]
   end
 end
 
-def install_prezto
+task :install_prezto do
   puts "\033[34m===> \033[0mInstalling Prezto (ZSH Enhancements)..."
   unless File.exists?(File.join(ENV['ZDOTDIR'] || ENV['HOME'], ".zprezto"))
     %x[/bin/zsh -c 'git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"']
