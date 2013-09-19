@@ -37,3 +37,7 @@ Node Version Manager
 Ruby Version Manager
 
 ![RVM](https://raw.github.com/3miliano/qutie/master/screenshots/rvm.png)
+
+jEnv (JavaVM Version Manager)
+
+![jEnv](https://raw.github.com/3miliano/qutie/master/screenshots/jenv.png)
