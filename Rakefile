@@ -20,6 +20,8 @@ task :install do
   install_prezto
   
   install_nvm
+
+  install_jenv
   
   install_fonts
   
@@ -241,6 +243,26 @@ def install_term_theme
     puts "\033[33mPreferences > Profiles > [your profile] > Colors > Load Preset...\033[0m"
     puts "\033[33m--------------------------------------------------------------------------\033[0m"
     return
+  end
+end
+
+def install_jenv
+  puts "\033[34m===> \033[0mInstalling jEnv (Java Version Manager)..."
+  unless File.exists?(File.join(ENV['HOME'], ".jenv"))
+    %x[git clone https://github.com/gcuisinier/jenv.git ~/.jenv]
+  end
+
+  puts "\033[34m===> \033[0mInstalling Prezto jEnv module..."
+  %x[cp -Rf $HOME/.qutie/zsh/modules/jenv $HOME/.zprezto/modules]
+  
+  puts "\033[34m===> \033[0mAdding default JDK..."
+  if File.exists?("/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home")
+    %x[$HOME/.jenv/bin/jenv add /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home]
+  end
+
+  Dir.glob("/Library/Java/JavaVirtualMachines/*") do |f|
+    puts "\033[34m===> \033[0mAdding JDK located at /Library/Java/JavaVirtualMachines/#{f}..."
+    %x[$HOME/.jenv/bin/jenv add #{f}/Contents/Home]
   end
 end
 
