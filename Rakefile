@@ -33,6 +33,9 @@ task :install_osx_defaults do
   puts "\033[34m===> \033[0mDisabling menu bar transparency..."
   %x[defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false]
 
+  puts "\033[34m===> \033[0mDisabling Dashboard..."
+  %x[defaults write com.apple.dashboard mcx-disabled -boolean true]
+
   puts "\033[34m===> \033[0mCustomizing battery indicator..."
   %x[defaults write com.apple.menuextra.battery ShowPercent -string "NO"]
   %x[defaults write com.apple.menuextra.battery ShowTime -string "YES"end]
