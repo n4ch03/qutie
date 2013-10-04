@@ -2,7 +2,7 @@ require 'rake'
 require 'fileutils'
 
 desc "Hook our dotfiles into system-standard positions."
-task :install => [ :welcome, :install_prezto,  :install_term_theme, :install_terminal_theme ] do
+task :install => [ :welcome, :install_osx_utils, :install_prezto,  :install_term_theme, :install_terminal_theme ] do
 
   success_msg("installed")
 end
